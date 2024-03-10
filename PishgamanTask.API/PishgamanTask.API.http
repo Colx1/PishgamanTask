@@ -1,0 +1,6 @@
+@PishgamanTask.API_HostAddress = http://localhost:5147
+
+GET {{PishgamanTask.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
