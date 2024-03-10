@@ -37,8 +37,8 @@ namespace PishgamanTask.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetPerson")]
-        public async Task<ActionResult<PersonDTO>> GetPerson([FromBody]int id)
+        [Route("GetPerson/{id}")]
+        public async Task<ActionResult<PersonDTO>> GetPerson([FromRoute]int id)
         {
             _logger.LogInformation($"GetPerson - ID: {id}");
 
