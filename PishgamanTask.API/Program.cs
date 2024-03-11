@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using PishgamanTask.API.Middleware;
 using PishgamanTask.Application.Interfaces;
 using PishgamanTask.Application.Services.Database;
 using PishgamanTask.Domain.Entities;
@@ -94,6 +95,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IUserAccountService, AccountRepository>();
 
 var app = builder.Build();
+
+//Associate middlewares
+
+app.UseMiddleware<IPBlockerMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
