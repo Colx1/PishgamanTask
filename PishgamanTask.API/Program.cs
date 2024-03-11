@@ -1,8 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 using PishgamanTask.Application.Interfaces;
 using PishgamanTask.Application.Services.Database;
+using PishgamanTask.Domain.Entities;
 using PishgamanTask.Infrastructure.Database;
 using PishgamanTask.Infrastructure.Repositories;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +22,64 @@ builder.Services.AddControllers();
 // Adding Swagger UI
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen(); //Added Authentication to SwaggerUI
 
 // ConnectionString
-builder.Services.AddDbContextPool<PishgamanContext>(options => options
+builder.Services.AddDbContext<PishgamanContext>(options => options
         .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Adding Identity and JWT
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    //Less securiy for now
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+
+    options.User.RequireUniqueEmail = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 2;
+    options.Password.RequiredUniqueChars = 0;
+})
+    .AddEntityFrameworkStores<PishgamanContext>()
+    .AddSignInManager()
+    .AddRoles<IdentityRole>();
+
+// JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
+
+// Swagger with authentication
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 // ************ DI ************ //
 builder.Services.AddScoped<IPersonService, PersonService>();
@@ -28,6 +90,8 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 // Adding AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
+// Adding Account DI
+builder.Services.AddScoped<IUserAccountService, AccountRepository>();
 
 var app = builder.Build();
 
@@ -36,10 +100,20 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors(policy =>
+    {
+        policy.WithOrigins("http://localhost:7067", "https://localhost:7067")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .WithHeaders(HeaderNames.ContentType);
+    });
 }
 
 app.UseHttpsRedirection();
 
+//First Authenticate then Authorize!
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
