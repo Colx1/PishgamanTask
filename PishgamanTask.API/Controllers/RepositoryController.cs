@@ -75,8 +75,8 @@ namespace PishgamanTask.API.Controllers
 
         #region Methods: DELETE
         [HttpDelete]
-        [Route("DeletePerson")]
-        public async Task<ActionResult<bool>> DeletePerson([FromBody]int id)
+        [Route("DeletePerson/{id}")]
+        public async Task<ActionResult<bool>> DeletePerson([FromRoute]int id)
         {
             _logger.LogInformation($"DeletePerson - ID: {id}");
 

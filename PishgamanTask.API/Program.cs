@@ -105,15 +105,16 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.UseCors(policy =>
-    {
-        policy.WithOrigins("http://localhost:7067", "https://localhost:7067")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .WithHeaders(HeaderNames.ContentType);
-    });
 }
+
+app.UseCors(policy =>
+{
+    //policy.WithOrigins("http://localhost:7067", "https://localhost:7067")
+    policy.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .WithHeaders(HeaderNames.ContentType);
+});
 
 app.UseHttpsRedirection();
 

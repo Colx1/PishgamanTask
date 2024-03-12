@@ -1,0 +1,56 @@
+﻿@page "/peoplelist"
+
+@using PishgamanTask.Blazor.Dtos
+@using PishgamanTask.Blazor.Interface
+
+
+
+<PageTitle>People List</PageTitle>
+
+<h3>PeopleList</h3>
+
+@if (people == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Person ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ppl in people)
+            {
+                <tr>
+                    <td>@ppl.Id</td>
+                    <td>@ppl.FirstName</td>
+                    <td>@ppl.LastName</td>
+                    <td>@ppl.Email</td>
+                    <td>@ppl.PhoneNumber</td>
+                    <td>
+                        <button class="btn btn-info">Edit</button>
+                        <button class="btn btn-danger">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<PersonDto>? people { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        people = await personService.GetAllPersonsAsync();
+    }
+}
