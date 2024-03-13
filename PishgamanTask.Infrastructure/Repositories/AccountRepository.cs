@@ -17,14 +17,14 @@ namespace PishgamanTask.Infrastructure.Repositories
 {
     public class AccountRepository(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config) : IUserAccountService
     {
-        public async Task<ModelResponse> CreateAccount(AppUserDTO appUserDto)
+        public async Task<RegisterResponse> CreateAccount(AppUserDTO appUserDto)
         {
             if (appUserDto == null)
-                return new ModelResponse(false, "Model is empty!");
+                return new RegisterResponse(false, "Model is empty!");
 
             var user = await userManager.FindByNameAsync(appUserDto.UserName);
             if(user != null)
-                return new ModelResponse(false, "User already exist in system!");
+                return new RegisterResponse(false, "User already exist in system!");
 
             var newUser = new ApplicationUser()
             {
@@ -34,7 +34,7 @@ namespace PishgamanTask.Infrastructure.Repositories
 
             var createUser = await userManager.CreateAsync(newUser, appUserDto!.Password);
             if(!createUser.Succeeded)
-                return new ModelResponse(false, "Error occured.. " + createUser.Errors.FirstOrDefault()?.Description.ToString());
+                return new RegisterResponse(false, "Error occured.. " + createUser.Errors.FirstOrDefault()?.Description.ToString());
 
 
             //Probably gonna check this on program Startup not here. Would change it later
@@ -43,7 +43,7 @@ namespace PishgamanTask.Infrastructure.Repositories
             {
                 await roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
                 await userManager.AddToRoleAsync(newUser, "Admin");
-                return new ModelResponse(true, "Account Created");
+                return new RegisterResponse(true, "Account Created");
             }
             else
             {
@@ -52,7 +52,7 @@ namespace PishgamanTask.Infrastructure.Repositories
                     await roleManager.CreateAsync(new IdentityRole() { Name = "User" });
 
                 await userManager.AddToRoleAsync(newUser, "User");
-                return new ModelResponse(true, "Account Created");
+                return new RegisterResponse(true, "Account Created");
             }
 
         }

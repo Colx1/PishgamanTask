@@ -10,7 +10,7 @@ namespace PishgamanTask.Application.Interfaces
 {
     internal interface IUserAccountRepository
     {
-        Task<ModelResponse> CreateAccount(AppUserDTO appUserDto);
+        Task<RegisterResponse> CreateAccount(AppUserDTO appUserDto);
 
         Task<LoginResponse> LoginAccount(LoginDTO loginDto);
     }

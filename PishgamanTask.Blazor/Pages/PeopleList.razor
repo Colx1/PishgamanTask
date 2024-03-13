@@ -61,7 +61,7 @@ else
 
 	private void Edit(PersonDto model)
 	{
-		NavigationManager.NavigateTo($"EditPerson/{model.Id}");
+		NavManager.NavigateTo($"EditPerson/{model.Id}");
 	}
 
 	private async Task Delete(int id)

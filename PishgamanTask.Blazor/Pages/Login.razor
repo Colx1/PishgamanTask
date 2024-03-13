@@ -1,7 +1,8 @@
 ﻿@page "/login"
 @using Microsoft.AspNetCore.Components.Authorization
 @using PishgamanTask.Blazor.Authentication
-@using PishgamanTask.Domain.DtoContracts
+@using PishgamanTask.Blazor.Dtos
+@using PishgamanTask.Blazor.Services
 
 
 @inject AuthenticationStateProvider AuthStateProvider
@@ -13,62 +14,65 @@
 <h3>Login</h3>
 
 <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <EditForm Model="User" OnValidSubmit="HandleLogin">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="card-header">Login</div>
-                <div class="card-body">
-                    @* Username *@
-                    <div class="form-group mb-3">
-                        <input @bind="User.UserName"
-                               class="form-control"
-                               placeholder="Username">
-                        </input>
-                    </div>
+	<div class="row">
+		<div class="col-md-6">
+			@if (!string.IsNullOrEmpty(Message))
+			{
+				<div class="alert alert-warning mb-3">@Message</div>
+			}
+			<EditForm Model="LoginModel" OnValidSubmit="LoginAsync">
+				<DataAnnotationsValidator />
+				<ValidationSummary />
+				<div class="card-header">Login</div>
+				<div class="card-body">
+					@* Username *@
+					<div class="form-group mb-3">
+						<input @bind="LoginModel.UserName"
+							   class="form-control"
+							   placeholder="Username">
+						</input>
+					</div>
 
-                    @* Password *@
-                    <div class="form-group">
-                        <div class="input-group mb-3">
-                            <input class="form-control"
-                                   @bind="User.Password"
-                                   placeholder="Password"
-                                   aria-label="Password"
-                                   aria-describedby="Password">
-                        </div>
-                    </div>
+					@* Password *@
+					<div class="form-group">
+						<div class="input-group mb-3">
+							<input class="form-control"
+								   @bind="LoginModel.Password"
+								   placeholder="Password"
+								   type="Password"
+								   aria-label="Password"
+								   aria-describedby="Password">
+						</div>
+					</div>
 
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-primary float-end"
-                            type="submit">
-                        Login
-                    </button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
+				</div>
+				<div class="card-footer">
+					<button class="btn btn-primary float-end"
+							type="submit">
+						Login
+					</button>
+				</div>
+			</EditForm>
+		</div>
+	</div>
 </div>
 
 @code {
-    public LoginDTO User { get; set; } = new();
+	public LoginDto LoginModel { get; set; } = new();
+	string? Message = string.Empty;
 
-    async Task HandleLogin()
-    {
-        // var (flag, token, message) = await AccountService.LoginAccount(User);
-        // if (flag)
-        // {
-        //     string customMessage = $"{message}{Environment.NewLine}{token}";
-        //     await js.InvokeVoidAsync("alert", customMessage);
-        //     User = new();
-
-        //     var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
-        //     await customAuthStateProvider.UpdateAuthenticationState(token);
-        //     NavManager.NavigateTo("/", forceLoad: true);
-        // }
-
-        await js.InvokeVoidAsync("alert", "hi");
-        return;
-    }
+	async Task LoginAsync()
+	{
+		var result = await accountService.LogInAccountAsync(LoginModel);
+		if (result.flag)
+		{
+			var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+			await customAuthStateProvider.UpdateAuthenticationState(result.token);
+			NavManager.NavigateTo("/", forceLoad: true);
+		}
+		else
+		{
+			Message = result.Message;
+		}
+	}
 }

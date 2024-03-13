@@ -8,7 +8,7 @@ namespace PishgamanTask.Application.Services
 {
     public class UserService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config) : IUserAccountService
     {
-        public async Task<ServiceResponse.ModelResponse> CreateAccount(AppUserDTO appUserDto)
+        public async Task<ServiceResponse.RegisterResponse> CreateAccount(AppUserDTO appUserDto)
         {
             throw new NotImplementedException();
         }
