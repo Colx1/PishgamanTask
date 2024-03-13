@@ -124,4 +124,41 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var scope = app.Services.GetService<IServiceScopeFactory>()?.CreateScope();
+if (scope != null)
+    await InitAccountAndRoles(scope.ServiceProvider);
+
 app.Run();
+
+
+async Task InitAccountAndRoles(IServiceProvider serviceProvider)
+{
+	var rolemanager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+	var usermanager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+	var roles = new List<string> { "Admin" };
+	foreach (var x in roles)
+	{
+		if ((await rolemanager.RoleExistsAsync(x)) == false)
+		{
+			var role = new IdentityRole(x);
+			await rolemanager.CreateAsync(role);
+		}
+	}
+
+	var adminuser = await usermanager.FindByNameAsync("admin");
+	if (adminuser == null)
+	{
+		adminuser = new ApplicationUser
+		{
+			Email = "admin@gmail.com",
+			UserName = "admin",
+			FullName = "AdminFullNAME",
+		};
+		usermanager.CreateAsync(adminuser, "password123").Wait();
+	}
+	if ((await usermanager.IsInRoleAsync(adminuser, "Admin")) == false)
+	{
+		usermanager.AddToRoleAsync(adminuser, "Admin").Wait();
+	}
+}

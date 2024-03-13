@@ -1,5 +1,7 @@
 ﻿@page "/peoplelist"
 
+@inject HttpClient _http
+
 @using PishgamanTask.Blazor.Dtos
 @using PishgamanTask.Blazor.Interface
 
@@ -51,6 +53,9 @@ else
 
 	protected override async Task OnInitializedAsync()
 	{
+		string token = await localStorageService.GetItemAsStringAsync("auth")!;
+		_http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
 		await LoadPeople();
 	}
 

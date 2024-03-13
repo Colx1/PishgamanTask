@@ -37,25 +37,25 @@ namespace PishgamanTask.Infrastructure.Repositories
                 return new RegisterResponse(false, "Error occured.. " + createUser.Errors.FirstOrDefault()?.Description.ToString());
 
 
-            //Probably gonna check this on program Startup not here. Would change it later
-            var checkAdmin = await roleManager.FindByNameAsync("Admin");
-            if (checkAdmin is null)
-            {
-                await roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
-                await userManager.AddToRoleAsync(newUser, "Admin");
-                return new RegisterResponse(true, "Account Created");
-            }
-            else
-            {
-                var checkUser = await roleManager.FindByNameAsync("User");
-                if (checkUser is null)
-                    await roleManager.CreateAsync(new IdentityRole() { Name = "User" });
+			////Probably gonna check this on program Startup not here. Would change it later
+			//var checkAdmin = await roleManager.FindByNameAsync("Admin");
+			//if (checkAdmin is null)
+			//{
+			//    await roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
+			//    await userManager.AddToRoleAsync(newUser, "Admin");
+			//    return new RegisterResponse(true, "Account Created");
+			//}
+			//else
+			//{
+			//    var checkUser = await roleManager.FindByNameAsync("User");
+			//    if (checkUser is null)
+			//        await roleManager.CreateAsync(new IdentityRole() { Name = "User" });
 
-                await userManager.AddToRoleAsync(newUser, "User");
-                return new RegisterResponse(true, "Account Created");
-            }
-
-        }
+			//    await userManager.AddToRoleAsync(newUser, "User");
+			//    return new RegisterResponse(true, "Account Created");
+			//}
+			return new RegisterResponse(true, "Account Created");
+		}
 
         public async Task<LoginResponse> LoginAccount(LoginDTO loginDto)
         {
@@ -85,8 +85,9 @@ namespace PishgamanTask.Infrastructure.Repositories
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role ?? "")
             };
+
             var token = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
