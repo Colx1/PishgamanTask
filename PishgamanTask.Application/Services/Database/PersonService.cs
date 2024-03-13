@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PishgamanTask.Application.Services.Database
 {
-    public class PersonService : IPersonService
+	public class PersonService : IPersonService
     {
         private readonly IPersonRepository _personRepository;
 
@@ -37,9 +37,18 @@ namespace PishgamanTask.Application.Services.Database
             return await _personRepository.InsertNewPersonAsync(person);
         }
 
-        public async Task<Person> UpdatePersonAsync(Person person)
+		public async Task<Person> UpdatePersonAsync(Person person)
         {
             return await _personRepository.UpdatePersonAsync(person);
         }
+		public async Task<bool> IsPhoneNumberExistsOnInsert(string phoneNum)
+		{
+            return await _personRepository.IsPhoneNumberExistsOnInsert(phoneNum);
+		}
+
+		public async Task<bool> IsPhoneNumberExistsOnUpdate(Person person)
+		{
+			return await _personRepository.IsPhoneNumberExistsOnUpdate(person);
+		}
     }
 }

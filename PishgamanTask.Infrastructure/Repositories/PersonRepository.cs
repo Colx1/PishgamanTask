@@ -68,10 +68,20 @@ namespace PishgamanTask.Infrastructure.Repositories
         {
             _logger.LogInformation($"UpdatePersonAsync - {JsonSerializer.Serialize(person)}");
 
-            _pishgamanDbContext.Tbl_People.Update(person);
+			_pishgamanDbContext.Tbl_People.Update(person);
             await _pishgamanDbContext.SaveChangesAsync();
 
             return person;
         }
-    }
+
+        public async Task<bool> IsPhoneNumberExistsOnInsert(string phoneNum)
+        {
+            return await _pishgamanDbContext.Tbl_People.AnyAsync(x => x.PhoneNumber == phoneNum);
+        }
+
+		public async Task<bool> IsPhoneNumberExistsOnUpdate(Person person)
+		{
+			return await _pishgamanDbContext.Tbl_People.AnyAsync(x => x.PhoneNumber == person.PhoneNumber && x.Id != person.Id);
+		}
+	}
 }

@@ -55,6 +55,10 @@ namespace PishgamanTask.API.Controllers
             _logger.LogInformation($"InsertPerson - {JsonSerializer.Serialize(person)}");
 
             var personMapped = _mapper.Map<Person>(person);
+
+            if (await _personService.IsPhoneNumberExistsOnInsert(personMapped.PhoneNumber))
+                return BadRequest("PhoneNumber already exists in database!");
+
             var results = await _personService.InsertNewPersonAsync(personMapped);
             return Ok(results);
         }
@@ -68,7 +72,11 @@ namespace PishgamanTask.API.Controllers
             _logger.LogInformation($"UpdatePerson - {JsonSerializer.Serialize(person)}");
 
             var personMapped = _mapper.Map<Person>(person);
-            var results = await _personService.UpdatePersonAsync(personMapped);
+
+            if(await _personService.IsPhoneNumberExistsOnUpdate(personMapped))
+				return BadRequest("PhoneNumber already exists in database, Can't update that!");
+
+			var results = await _personService.UpdatePersonAsync(personMapped);
             return Ok(results);
         }
         #endregion

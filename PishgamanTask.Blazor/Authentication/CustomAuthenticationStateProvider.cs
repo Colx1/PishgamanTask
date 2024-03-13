@@ -7,6 +7,7 @@ namespace PishgamanTask.Blazor.Authentication
 {
     public class CustomAuthenticationStateProvider(ILocalStorageService localStorageService) : AuthenticationStateProvider
     {
+        private const string LocalStorageKey = "auth";
         private ClaimsPrincipal anonymous = new(new ClaimsIdentity());
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {

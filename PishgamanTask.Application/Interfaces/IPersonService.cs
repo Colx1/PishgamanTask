@@ -18,5 +18,8 @@ namespace PishgamanTask.Application.Interfaces
         Task<Person> UpdatePersonAsync(Person person);
 
         Task<bool> DeletePersonAsync(int id);
-    }
+
+		Task<bool> IsPhoneNumberExistsOnInsert(string phoneNum);
+		Task<bool> IsPhoneNumberExistsOnUpdate(Person person);
+	}
 }
