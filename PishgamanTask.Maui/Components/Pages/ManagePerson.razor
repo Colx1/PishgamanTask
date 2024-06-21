@@ -1,0 +1,83 @@
+﻿@page "/AddPerson"
+@page "/EditPerson/{Id:int}"
+@using PishgamanTask.Maui.Dtos
+
+<h3>Manage Person</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Add Product</div>
+                <div class="card-body">
+                    <EditForm Model="Person" OnValidSubmit="HandleSave">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <InputText @bind-Value="Person.FirstName" class="form-control"></InputText>
+                            <ValidationMessage For="()=>Person.FirstName"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <InputText @bind-Value="Person.LastName" class="form-control"></InputText>
+                            <ValidationMessage For="()=>Person.LastName"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <InputText @bind-Value="Person.Email" class="form-control"></InputText>
+                            <ValidationMessage For="()=>Person.Email"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <InputText @bind-Value="Person.PhoneNumber" class="form-control"></InputText>
+                            <ValidationMessage For="()=>Person.PhoneNumber"></ValidationMessage>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary"> Save</button>
+                    </EditForm>
+                </div>
+
+                <div class="card-footer">
+                    Id: @ReturnPerson.Id <br />
+                    First Name:@ReturnPerson.FirstName <br />
+                    Last Name:@ReturnPerson.LastName <br />
+                    Email: @ReturnPerson.Email <br />
+                    Phone: @ReturnPerson.PhoneNumber
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public PersonDto Person { get; set; } = new();
+    [Parameter] public int Id { get; set; }
+
+    private PersonDto ReturnPerson = new();
+    private async Task HandleSave()
+    {
+        if (Person.Id > 0)
+        {
+            ReturnPerson = await personService.UpdatePersonAsync(Person);
+            Person = new();
+        }
+
+        else
+        {
+            ReturnPerson = await personService.InsertNewPersonAsync(Person);
+            Person = new();
+
+        }
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
+            Person = await personService.GetPersonAsync(Id);
+    }
+}

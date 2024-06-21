@@ -1,0 +1,20 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using PishgamanTask.Maui
+@using PishgamanTask.Maui.Components
+
+@using PishgamanTask.Maui.Interface
+
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService localStorageService
+@inject IJSRuntime js
+@inject IPersonService personService;
+@inject IAccountService accountService;

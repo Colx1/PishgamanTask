@@ -1,0 +1,32 @@
+﻿@using System.Security.Claims
+@inherits LayoutComponentBase
+<div class="page">
+	<div class="sidebar">
+		<NavMenu />
+	</div>
+
+	<main>
+		<div class="top-row px-4">
+			<AuthorizeView>
+				<Authorized>
+					<a href="logout">Logout</a>
+					<span class="text-muted px-4">
+						@context.User.Identity!.Name
+						[@context.User.Claims.FirstOrDefault(z => z.Type == ClaimTypes.Email)!.Value]
+					</span>
+				</Authorized>
+				<NotAuthorized>
+					<a href="login">Login</a>
+					<a href="register">Register</a>
+				</NotAuthorized>
+			</AuthorizeView>
+
+
+			<a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+		</div>
+
+		<article class="content px-4">
+			@Body
+		</article>
+	</main>
+</div>

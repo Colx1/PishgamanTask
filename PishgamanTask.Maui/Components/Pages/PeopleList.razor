@@ -1,0 +1,76 @@
+﻿@page "/peoplelist"
+
+@inject HttpClient _http
+
+@using PishgamanTask.Maui.Dtos
+@using PishgamanTask.Maui.Interface
+
+
+<PageTitle>People List</PageTitle>
+
+<h3>PeopleList</h3>
+
+@if (people == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Person ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Email</th>
+				<th>Phone</th>
+				<th>Action</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var person in people)
+			{
+				<tr>
+					<td>@person.Id</td>
+					<td>@person.FirstName</td>
+					<td>@person.LastName</td>
+					<td>@person.Email</td>
+					<td>@person.PhoneNumber</td>
+					<td>
+						<button class="btn btn-info" @onclick="()=>Edit(person)">Edit</button>
+						<button class="btn btn-danger" @onclick="()=>Delete(person.Id)">Remove</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private IEnumerable<PersonDto>? people { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		string token = await localStorageService.GetItemAsStringAsync("auth")!;
+		_http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+		await LoadPeople();
+	}
+
+	private async Task LoadPeople()
+	{
+		people = await personService.GetAllPersonsAsync();
+	}
+
+	private void Edit(PersonDto model)
+	{
+		NavManager.NavigateTo($"EditPerson/{model.Id}");
+	}
+
+	private async Task Delete(int id)
+	{
+		var product = await personService.DeletePersonAsync(id);
+		await LoadPeople();
+	}
+}
